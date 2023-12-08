@@ -1,0 +1,14 @@
+store_id,name,phone,address,city
+STR_001,SuperMart,(555) 111-1111,4444 Cypress Grove Lane,New York
+STR_002,MegaGrocery,(555) 222-2222,4545 Pinecrest Avenue,Los Angeles
+STR_003,CityMart,(555) 333-3333,4646 Laurel Lane,Denver
+STR_004,GlobeMart,(555) 444-4444,4747 Meadowview Court,Riverside
+STR_005,Sunny Supermarket,(555) 555-5555,4848 Forest Ridge Drive,Austin
+STR_006,UrbanMarket,(555) 666-6666,4949 Brookside Street,Dallas
+STR_007,MetroGrocers,(555) 777-7777,5050 Greenbriar Road,Portland
+STR_008,City Essentials,(555) 888-8888,5151 Sunflower Avenue,San Francisco
+STR_009,NeighborhoodMart,(555) 999-9999,5252 Hillside Boulevard,San Antonio
+STR_010,Sunrise Superstore,(555) 101-0101,5353 Riverfront Lane,New York
+STR_011,CentralGrocery,(555) 202-0202,5454 Oakmont Court,Los Angeles
+STR_012,EvergreenMart,(555) 303-0303,5555 Redstone Road,Denver
+STR_013,PeakProvisions,(555) 404-0404,5656 Briarwood Drive,Riverside

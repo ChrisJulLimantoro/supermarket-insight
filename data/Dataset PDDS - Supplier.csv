@@ -1,0 +1,42 @@
+Supplier_id,name,email,address,city,country
+SUPP_001,Sunrise Imports Inc,sunriseimports@gmail.com,123 Main Street,New York,USA
+SUPP_002,Mega Deals Corporation,megadeals@gmail.com,456 Elm Avenue,Los Angeles,USA
+SUPP_003,Green World Enterprises,greenworld@gmail.com,789 Oak Boulevard,Chicago,USA
+SUPP_004,Quality Goods Inc,qualitygoods@gmail.com,101 Pine Road,Houston,USA
+SUPP_005,Coastal Distributors,coastaldistributors@gmail.com,234 Cedar Lane,Miami,USA
+SUPP_006,Pioneer Traders,pioneertraders@gmail.com,567 Maple Drive,San Francisco,USA
+SUPP_007,EcoWise Solutions,ecowise@gmail.com,890 Birch Street,Boston,USA
+SUPP_008,Metro Merchandise Inc,metromerchandise@gmail.com,111 Willow Avenue,Atlanta,USA
+SUPP_009,Express Imports,expressimports@gmail.com,222 Spruce Lane,Dallas,USA
+SUPP_010,Superior Supplies Inc,superiorsupplies@gmail.com,333 Fir Road,Phoenix,USA
+SUPP_011,Prime Sourcing Solutions,primesourcing@gmail.com,444 Redwood Drive,San Diego,USA
+SUPP_012,Golden Harvest Traders,goldenharvest@gmail.com,555 Sequoia Lane,Seattle,USA
+SUPP_013,Global Merchants,globalmerchants@gmail.com,666 Cedar Avenue,Denver,USA
+SUPP_014,Ace Imports Inc,aceimports@gmail.com,777 Juniper Street,Las Vegas,USA
+SUPP_015,Central Marketplace,centralmarketplace@gmail.com,888 Hemlock Road,Portland,USA
+SUPP_016,US Distribution Hub,usdistributionhub@gmail.com,999 Sycamore Lane,Philadelphia,USA
+SUPP_017,Tech Corner Store,techcornerstore@gmail.com,1010 Magnolia Avenue,Austin,USA
+SUPP_018,Innovative Imports,innovativeimports@gmail.com,1111 Walnut Street,San Antonio,USA
+SUPP_019,City Central Distributors,citycentral@gmail.com,1212 Birch Lane,Orlando,USA
+SUPP_020,Global Trading Partners,globaltradingpartners@gmail.com,1313 Oak Avenue,Nashville,USA
+SUPP_021,Quality Imports Corp,qualityimports@gmail.com,1414 Pine Road,Memphis,USA
+SUPP_022,Smart Deals Inc,smartdeals@gmail.com,1515 Cedar Lane,Chicago,USA
+SUPP_023,New Horizons Enterprises,newhorizons@gmail.com,1616 Elm Avenue,Cleveland,USA
+SUPP_024,Grand Mart Imports,grandmartimports@gmail.com,1717 Redwood Drive,Los Angeles,USA
+SUPP_025,Citywide Traders,citywidetraders@gmail.com,1818 Oak Boulevard,Phoenix,USA
+SUPP_026,Sunrise Supplies Inc,sunrisesupplies@gmail.com,1919 Juniper Street,Miami,USA
+SUPP_027,Innovative Enterprises,innovativeenterprises@gmail.com,2020 Magnolia Avenue,Seattle,USA
+SUPP_028,Pioneer Imports,pioneerimports@gmail.com,2121 Walnut Street,Dallas,USA
+SUPP_029,TechPro Solutions,techprosolutions@gmail.com,2222 Cedar Lane,San Francisco,USA
+SUPP_030,EcoEdge Innovations,ecoedgeinnovations@gmail.com,2323 Hemlock Road,San Antonio,USA
+SUPP_031,Digital Dynamics,digitaldynamics@gmail.com,2424 Elm Avenue,Riverside,USA
+SUPP_032,SmartSource Imports,smartsourceimports@gmail.com,2525 Redwood Drive,Austin,USA
+SUPP_033,MetroTech Innovations,metrotechinnovations@gmail.com,2626 Oak Boulevard,Dallas,USA
+SUPP_034,Infinite Traders LLC,infinitedistributors@gmail.com,2727 Pine Road,Portland,USA
+SUPP_035,PowerPlay Corp,powerplaycorp@gmail.com,2828 Juniper Street,Riverside,USA
+SUPP_036,Future Enterprises,futureenterprises@gmail.com,2929 Cedar Lane,Memphis,USA
+SUPP_037,City Distributors,citydistributors@gmail.com,3030 Magnolia Avenue,New York,USA
+SUPP_038,TechTronix Solutions,techtronixsolutions@gmail.com,3131 Walnut Street,Los Angeles,USA
+SUPP_039,NexGen Enterprises,nexgenenterprises@gmail.com,3232 Hemlock Road,Denver,USA
+SUPP_040,EcoGizmo Imports,ecogizmoimports@gmail.com,3333 Elm Avenue,Chicago,USA
+SUPP_041,iDeals Innovations,idealsinnovations@gmail.com,3434 Redwood Drive,Houston,USA

@@ -1,0 +1,53 @@
+employee_id,first_name,last_name,phone,email,hire_date,address,city,store_id
+EMP_001,Emma,Smith,(555) 123-4567,emma.smith@gmail.com,21/08/2017,5757 Meadowlark Lane,New York,STR_001
+EMP_002,Liam,Johnson,(555) 234-5678,liam.johnson@gmail.com,15/04/2016,5858 Oakridge Avenue,Los Angeles,STR_002
+EMP_003,Olivia,Williams,(555) 345-6789,olivia.williams@gmail.com,07/11/2019,5959 Birchwood Court,Denver,STR_003
+EMP_004,Noah,Jones,(555) 456-7890,noah.jones@gmail.com,18/02/2018,6060 Sunset Ridge Drive,Riverside,STR_004
+EMP_005,Ava,Brown,(555) 567-8901,ava.brown@gmail.com,30/06/2015,6161 Pinehurst Lane,Austin,STR_005
+EMP_006,Mason,Davis,(555) 678-9012,mason.davis@gmail.com,14/04/2019,6262 Maple Grove Road,Dallas,STR_006
+EMP_007,Sophia,Miller,(555) 789-0123,sophia.miller@gmail.com,03/07/2020,6363 Cedar Valley Court,Portland,STR_007
+EMP_008,Logan,Wilson,(555) 890-1234,logan.wilson@gmail.com,12/09/2016,6464 Willowbend Street,San Francisco,STR_008
+EMP_009,Aria,Lopez,(555) 901-2345,aria.lopez@gmail.com,19/12/2017,6565 Evergreen Terrace,San Antonio,STR_009
+EMP_010,Elijah,Clark,(555) 123-9876,elijah.clark@gmail.com,25/03/2015,6666 Sycamore Springs Road,New York,STR_010
+EMP_011,Harper,Young,(555) 234-5670,harper.young@gmail.com,19/05/2018,6767 Redwood Glen Lane,Los Angeles,STR_011
+EMP_012,Layla,Moore,(555) 345-6781,layla.moore@gmail.com,14/10/2019,6868 Magnolia Lane,Denver,STR_012
+EMP_013,Carter,Anderson,(555) 456-7892,carter.anderson@gmail.com,03/09/2016,6969 Aspen Meadows Drive,Riverside,STR_013
+EMP_014,Aiden,Harris,(555) 567-8903,aiden.harris@gmail.com,28/12/2017,7070 Bluebell Avenue,New York,STR_001
+EMP_015,Aubrey,Scott,(555) 678-9014,aubrey.scott@gmail.com,12/02/2015,7171 Harmony Hills Road,Los Angeles,STR_002
+EMP_016,Zoey,Turner,(555) 789-0125,zoey.turner@gmail.com,18/06/2019,7272 Meadowview Lane,Denver,STR_003
+EMP_017,Ethan,Adams,(555) 890-1236,ethan.adams@gmail.com,10/11/2015,7373 Juniper Junction Boulevard,Riverside,STR_004
+EMP_018,Luna,Perez,(555) 901-2347,luna.perez@gmail.com,27/07/2016,7474 Pinecone Path,Austin,STR_005
+EMP_019,Charlotte,Hall,(555) 123-9878,charlotte.hall@gmail.com,14/08/2018,7575 Forest Grove Avenue,Dallas,STR_006
+EMP_020,Logan,Roberts,(555) 234-5671,logan.roberts@gmail.com,05/06/2017,7676 Laurel Haven Court,Portland,STR_007
+EMP_021,Ellie,King,(555) 345-6783,ellie.king@gmail.com,30/01/2016,7777 Tranquil Terrace,San Francisco,STR_008
+EMP_022,Henry,Turner,(555) 456-7894,henry.turner@gmail.com,09/10/2015,7878 Sunflower Grove Lane,San Antonio,STR_009
+EMP_023,Harper,King,(555) 567-8905,harper.king@gmail.com,21/07/2019,7979 Whispering Pines Drive,New York,STR_010
+EMP_024,Gavin,Cooper,(555) 567-8906,gavin.cooper@gmail.com,02/04/2018,8080 Cedar Creek Lane,Los Angeles,STR_011
+EMP_025,Stella,Martinez,(555) 678-9017,stella.martinez@gmail.com,11/09/2017,8181 Willowbrook Avenue,Denver,STR_012
+EMP_026,Oliver,Bennett,(555) 789-0128,oliver.bennett@gmail.com,23/05/2016,8282 Mountain View Drive,Riverside,STR_013
+EMP_027,Mia,Ramirez,(555) 890-1239,mia.ramirez@gmail.com,14/08/2019,8383 Meadowland Court,New York,STR_001
+EMP_028,Jack,Gray,(555) 901-2340,jack.gray@gmail.com,07/03/2018,8484 Pine Shadows Lane,Los Angeles,STR_002
+EMP_029,Chloe,Foster,(555) 123-9871,chloe.foster@gmail.com,29/11/2016,8585 Redwood Grove Road,Denver,STR_003
+EMP_030,William,Stewart,(555) 234-5672,william.stewart@gmail.com,18/06/2017,8686 Autumn Breeze Street,Riverside,STR_004
+EMP_031,Zoey,Cooper,(555) 345-6784,zoey.cooper@gmail.com,01/02/2019,8787 Birchwood Haven Lane,Austin,STR_005
+EMP_032,Jackson,Brooks,(555) 456-7895,jackson.brooks@gmail.com,27/04/2016,8888 Maple Ridge Boulevard,Dallas,STR_006
+EMP_033,Emily,Watson,(555) 567-8906,emily.watson@gmail.com,05/10/2017,8989 Sunflower Meadows Drive,Portland,STR_007
+EMP_034,Daniel,Bailey,(555) 678-9017,daniel.bailey@gmail.com,16/12/2018,9090 Misty Morning Lane,San Francisco,STR_008
+EMP_035,Addison,Sanders,(555) 789-0128,addison.sanders@gmail.com,09/03/2016,9191 Evergreen Crest Road,San Antonio,STR_009
+EMP_036,Lincoln,Price,(555) 890-1239,lincoln.price@gmail.com,28/07/2015,9292 Serenity Springs Lane,New York,STR_010
+EMP_037,Lily,Hayes,(555) 901-2340,lily.hayes@gmail.com,15/09/2019,9393 Blue Sky Terrace,Los Angeles,STR_011
+EMP_038,Isaac,Rivera,(555) 123-9871,isaac.rivera@gmail.com,04/11/2017,9494 Tranquil Valley Road,Denver,STR_012
+EMP_039,Penelope,Morgan,(555) 234-5672,penelope.morgan@gmail.com,20/02/2018,9595 Harmony Haven Court,Riverside,STR_013
+EMP_040,Ethan,Reed,(555) 345-6784,ethan.reed@gmail.com,12/05/2016,9696 Sycamore Ridge Drive,New York,STR_001
+EMP_041,Harper,Turner,(555) 456-7895,harper.turner@gmail.com,26/09/2019,9797 Whispering Winds Lane,Los Angeles,STR_002
+EMP_042,Aiden,Wright,(555) 567-8906,aiden.wright@gmail.com,08/03/2018,9898 Meadowview Terrace,Denver,STR_003
+EMP_043,Ava,Brooks,(555) 678-9017,ava.brooks@gmail.com,03/06/2017,9999 Twilight Trail,Riverside,STR_004
+EMP_044,Elijah,Hayes,(555) 789-0128,elijah.hayes@gmail.com,17/09/2016,10101 Silver Birch Lane,Austin,STR_005
+EMP_045,Zoey,Rogers,(555) 890-1239,zoey.rogers@gmail.com,29/01/2015,10202 Morning Mist Court,Dallas,STR_006
+EMP_046,Mason,Morgan,(555) 901-2340,mason.morgan@gmail.com,14/04/2018,10303 Crimson Creek Road,Portland,STR_007
+EMP_047,Olivia,Powell,(555) 123-9871,olivia.powell@gmail.com,01/11/2017,10404 Oakleaf Avenue,San Francisco,STR_008
+EMP_048,Logan,Butler,(555) 234-5672,logan.butler@gmail.com,19/05/2016,10505 Pine Grove Lane,San Antonio,STR_009
+EMP_049,Harper,Turner,(555) 345-6784,harper.turner@gmail.com,09/10/2018,10606 Whispering Brook Court,New York,STR_010
+EMP_050,Jackson,Howard,(555) 456-7895,jackson.howard@gmail.com,23/02/2019,10707 Meadowlark Vista Drive,Los Angeles,STR_011
+EMP_051,Lily,Carter,(555) 567-8906,lily.carter@gmail.com,06/07/2016,10808 Crystal Springs Boulevard,Denver,STR_012
+EMP_052,Oliver,Hayes,(555) 678-9017,oliver.hayes@gmail.com,18/12/2017,10909 Redwood Heights Lane,Riverside,STR_013
