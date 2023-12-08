@@ -1,9 +1,17 @@
 <?php require_once "./connect.php"; ?>
 <?php
     if(isset($_POST['ajax'])){
-        $sql = "SELECT * FROM supplier";
-        $stmt = $conn_sql->prepare($sql);
-        $stmt->execute();
+        try {
+            $sql = "SELECT * FROM supplier";
+            $stmt = $conn_sql->prepare($sql);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            // if no table yet
+            $data = [['No data available at the moment!']];
+            $headers = ['data'];
+            echo json_encode(['header' => $headers, 'data' => $data]);
+            exit;
+        }
         $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $data = [];
         if(!isset($res) || !$res){
@@ -96,6 +104,7 @@
                     success: function(res){
                         res = JSON.parse(res);
                         console.log(res);
+                        $("#input-form").attr("hidden",true);
                         let data = {
                                 columns: res.header,
                                 rows: res.data,

@@ -12,7 +12,7 @@
             $file_tmp = $_FILES['file']['tmp_name'];
             $handle = fopen($file_tmp, 'r');
             if($upload == "supplier"){
-                $file = $_FILES['file'];
+                // $file = $_FILES['file'];
                 if ($handle !== false) {
                     $headers = fgetcsv($handle, 0, ',');
                     $sql = "CREATE TABLE supplier (
@@ -34,6 +34,36 @@
                             ":email" => $dataIn[2],
                             ":address" => $dataIn[3],
                             ":city" => $dataIn[4]
+                        ]);
+                        $data[] = $dataIn;
+                    }
+                }
+                echo json_encode(['header' => $headers, 'data' => $data]);
+            } else if($upload == "product"){
+                // $file = $_FILES['file'];
+                if ($handle !== false) {
+                    $headers = fgetcsv($handle, 0, ',');
+                    $sql = "CREATE TABLE product (
+                        product_id VARCHAR(7)  PRIMARY KEY,
+                        name VARCHAR(30) NOT NULL,
+                        description TEXT NOT NULL,
+                        category_id VARCHAR(7),
+                        price float,
+                        unit VARCHAR(20)
+                        )";
+                    $conn_sql->exec($sql);
+                    $data = [];
+                    // Process the remaining rows
+                    while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
+                        $insert = "INSERT INTO product (product_id, name, description, category_id, price, unit) VALUES (:id, :name, :description, :category, :price, :unit)";
+                        $stmt = $conn_sql->prepare($insert);
+                        $stmt->execute([
+                            ":id" => $dataIn[0],
+                            ":name" => $dataIn[1],
+                            ":description" => $dataIn[2],
+                            ":category" => $dataIn[3],
+                            ":price" => $dataIn[4],
+                            ":unit" => $dataIn[5]
                         ]);
                         $data[] = $dataIn;
                     }
