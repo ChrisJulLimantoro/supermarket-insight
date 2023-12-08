@@ -42,7 +42,7 @@
         <!-- <div class="grid grid-cols-12"> -->
         <div class="ml-60 px-8 py-3">
             <div class="flex w-full h-24 rounded-lg shadow-lg items-center justify-center mb-8">
-                <h1 class="text-center uppercase font-bold text-3xl">Data Supplier Supermarket Insight</h1>
+                <h1 class="text-center uppercase font-bold text-3xl">Data Supplier</h1>
             </div>
             <div class="grid grid-cols-8 gap-8">
                 <div class="col-span-8" id="input-form">

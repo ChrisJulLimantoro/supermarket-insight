@@ -69,6 +69,28 @@
                     }
                 }
                 echo json_encode(['header' => $headers, 'data' => $data]);
+            }else if($upload == "category"){
+                // $file = $_FILES['file'];
+                if ($handle !== false) {
+                    $headers = fgetcsv($handle, 0, ',');
+                    $sql = "CREATE TABLE category (
+                        category_id VARCHAR(7) PRIMARY KEY,
+                        name VARCHAR(30) NOT NULL
+                        )";
+                    $conn_sql->exec($sql);
+                    $data = [];
+                    // Process the remaining rows
+                    while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
+                        $insert = "INSERT INTO category (category_id, name) VALUES (:id, :name)";
+                        $stmt = $conn_sql->prepare($insert);
+                        $stmt->execute([
+                            ":id" => $dataIn[0],
+                            ":name" => $dataIn[1],
+                        ]);
+                        $data[] = $dataIn;
+                    }
+                }
+                echo json_encode(['header' => $headers, 'data' => $data]);
             }
             exit;
         }
