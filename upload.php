@@ -115,6 +115,102 @@
                     }
                 }
                 echo json_encode(['header' => $headers, 'data' => $data]);
+            }else if($upload == "store"){
+                // $file = $_FILES['file'];
+                if ($handle !== false) {
+                    $headers = fgetcsv($handle, 0, ',');
+                    $sql = "CREATE TABLE store (
+                        store_id VARCHAR(7) PRIMARY KEY,
+                        name VARCHAR(45) NOT NULL,
+                        phone VARCHAR(30) NOT NULL,
+                        address VARCHAR(30) NOT NULL,
+                        city VARCHAR(30) NOT NULL
+                        )";
+                    $conn_sql->exec($sql);
+                    $data = [];
+                    // Process the remaining rows
+                    while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
+                        $insert = "INSERT INTO store (store_id, name, phone, address, city) VALUES (:id, :name, :phone, :address, :city)";
+                        $stmt = $conn_sql->prepare($insert);
+                        $stmt->execute([
+                            ":id" => $dataIn[0],
+                            ":name" => $dataIn[1],
+                            ":phone" => $dataIn[2],
+                            ":address" => $dataIn[3],
+                            ":city" => $dataIn[4]
+                        ]);
+                        $data[] = $dataIn;
+                    }
+                }
+                echo json_encode(['header' => $headers, 'data' => $data]);
+            }else if($upload == "employee"){
+                // $file = $_FILES['file'];
+                if ($handle !== false) {
+                    $headers = fgetcsv($handle, 0, ',');
+                    $sql = "CREATE TABLE employee (
+                        employee_id VARCHAR(7) PRIMARY KEY,
+                        first_name VARCHAR(30) NOT NULL,
+                        last_name VARCHAR(30) NOT NULL,
+                        phone VARCHAR(30) NOT NULL,
+                        email VARCHAR(30) NOT NULL,
+                        hire_date DATE NOT NULL,
+                        address VARCHAR(30) NOT NULL,
+                        city VARCHAR(30) NOT NULL,
+                        store_id VARCHAR(7) NOT NULL
+                        )";
+                    $conn_sql->exec($sql);
+                    $data = [];
+                    // Process the remaining rows
+                    while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
+                        $insert = "INSERT INTO employee VALUES (:id, :first,:last, :phone, :email, :hire, :address, :city, :store)";
+                        $stmt = $conn_sql->prepare($insert);
+                        $stmt->execute([
+                            ":id" => $dataIn[0],
+                            ":first" => $dataIn[1],
+                            ":last" => $dataIn[2],
+                            ":phone" => $dataIn[3],
+                            ":email" => $dataIn[4],
+                            ":hire" => DateTime::createFromFormat("dd/mm/yyyy",$dataIn[5]),
+                            ":address" => $dataIn[6],
+                            ":city" => $dataIn[7],
+                            ":store" => $dataIn[8]
+                        ]);
+                        $data[] = $dataIn;
+                    }
+                }
+                echo json_encode(['header' => $headers, 'data' => $data]);
+            }else if($upload == "customer"){
+                // $file = $_FILES['file'];
+                if ($handle !== false) {
+                    $headers = fgetcsv($handle, 0, ',');
+                    $sql = "CREATE TABLE customer (
+                        customer_id VARCHAR(8) PRIMARY KEY,
+                        first_name VARCHAR(30) NOT NULL,
+                        last_name VARCHAR(30) NOT NULL,
+                        phone VARCHAR(30) NOT NULL,
+                        email VARCHAR(30) NOT NULL,
+                        gender VARCHAR(30) NOT NULL,
+                        join_date DATE NOT NULL
+                        )";
+                    $conn_sql->exec($sql);
+                    $data = [];
+                    // Process the remaining rows
+                    while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
+                        $insert = "INSERT INTO customer  VALUES (:id, :first, :last, :phone, :email, :gender, :join)";
+                        $stmt = $conn_sql->prepare($insert);
+                        $stmt->execute([
+                            ":id" => $dataIn[0],
+                            ":first" => $dataIn[1],
+                            ":last" => $dataIn[2],
+                            ":phone" => $dataIn[3],
+                            ":email" => $dataIn[4],
+                            ":gender" => $dataIn[5],
+                            ":join" => DateTime::createFromFormat("dd/mm/yyyy",$dataIn[6])
+                        ]);
+                        $data[] = $dataIn;
+                    }
+                }
+                echo json_encode(['header' => $headers, 'data' => $data]);
             }
             exit;
         }
