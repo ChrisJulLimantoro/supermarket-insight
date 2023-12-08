@@ -91,6 +91,30 @@
                     }
                 }
                 echo json_encode(['header' => $headers, 'data' => $data]);
+            }else if($upload == "warehouse"){
+                // $file = $_FILES['file'];
+                if ($handle !== false) {
+                    $headers = fgetcsv($handle, 0, ',');
+                    $sql = "CREATE TABLE warehouse (
+                        warehouse_id VARCHAR(7) PRIMARY KEY,
+                        address VARCHAR(30) NOT NULL,
+                        city VARCHAR(30) NOT NULL
+                        )";
+                    $conn_sql->exec($sql);
+                    $data = [];
+                    // Process the remaining rows
+                    while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
+                        $insert = "INSERT INTO warehouse (warehouse_id, address, city) VALUES (:id, :address, :city)";
+                        $stmt = $conn_sql->prepare($insert);
+                        $stmt->execute([
+                            ":id" => $dataIn[0],
+                            ":address" => $dataIn[1],
+                            ":city" => $dataIn[2]
+                        ]);
+                        $data[] = $dataIn;
+                    }
+                }
+                echo json_encode(['header' => $headers, 'data' => $data]);
             }
             exit;
         }
