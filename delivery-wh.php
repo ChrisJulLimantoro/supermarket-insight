@@ -2,8 +2,39 @@
 <?php
     if(isset($_POST['ajax'])){
         // mongodb query and checking
+        $res = [];
+        try{
+            $collection = $conn_mongo->Ceje->delivery_to_warehouse;
+            $cursor = $collection->find([],
+            [
+                'projection' => [
+                '_id' => 0,
+                ]
+            ]);
+            foreach($cursor as $doc){
+                $temp = [];
+                foreach($doc as $key => $value){
+                    if($key == "products"){
+                        $str = "";
+                        foreach ($value as $v){
+                            $str .= $v['product_id'] . " - price : ". $v['unit_price'] . " - qty : " . $v['qty'] . "; ";
+                        }
+                        $temp[$key] = $str;
+                    }else{
+                        $temp[$key] = $value;
+                    }
+                }
+                $res[] = $temp;
+            }
+        }catch(MongoDBException $e){
+            echo json_encode(['header' => ['data'], 'data' => [['No data available at the moment!']]]);
+            exit;
+        }catch(Exception $e){
+            echo json_encode(['header' => ['data'], 'data' => [['No data available at the moment!']]]);
+            exit;
+        }
         $data = [];
-        if(!isset($res) || !$res){
+        if(!isset($res) || !$res || $res == []){
             $data = [['No data available at the moment!']];
             $headers = ['data'];
         }else{
