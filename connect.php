@@ -5,7 +5,6 @@
 
     // Connection to MonggoDB
     $conn_mongo = new MongoDB\Client();
-    $conn_mongo = $conn_mongo->Ceje->supermarket;
 
     // Connection to Neo4j
     $conn_neo = Laudis\Neo4j\ClientBuilder::create()

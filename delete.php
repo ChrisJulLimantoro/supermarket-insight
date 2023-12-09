@@ -5,6 +5,9 @@
             $sql = "DROP TABLE ".$_POST['delete'];
             $conn_sql->exec($sql);
             exit;
+        }else if($_POST['db'] == "mongodb"){
+            $collection = $conn_mongo->Ceje->delivery_to_store;
+            $collection->drop();
         }
     }
 ?>

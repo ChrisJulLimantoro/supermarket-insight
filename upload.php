@@ -211,6 +211,43 @@
                     }
                 }
                 echo json_encode(['header' => $headers, 'data' => $data]);
+            }else if($upload == "delivery-to-store"){
+                // $file = $_FILES['file'];
+                if ($handle !== false) {
+                    $headers = fgetcsv($handle, 0, ',');
+                    $collection = $conn_mongo->Ceje->delivery_to_store;
+                    $data = [];
+                    $in = [];
+                    // Process the remaining rows
+                    while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
+                        if(!isset($in[$dataIn[0]])){
+                            $in[$dataIn[0]] = [];
+                        }
+                        foreach($dataIn as $key => $value){
+                            if($headers[$key] == "product_id"){
+                                if(!isset($in[$dataIn[0]]["products"])){
+                                    $in[$dataIn[0]]["products"] = [['product_id' => $value, 'qty' => $dataIn[array_search('qty', $headers)]]];
+                                }else{
+                                    $in[$dataIn[0]]["products"][] = ['product_id' => $value, 'qty' => $dataIn[array_search('qty', $headers)]];
+                                }
+                            }else if($headers[$key] == "qty"){
+                                continue;
+                            }else{
+                                if(!isset($in[$dataIn[0]][$headers[$key]])){
+                                    $in[$dataIn[0]][$headers[$key]] = $value;
+                                }else{
+                                    continue;
+                                }
+                            }
+                        }
+                        $data[] = $dataIn;
+                    }
+                    foreach($in as $key => $value){
+                        $collection->insertOne($value);
+                    }
+                    
+                }
+                echo json_encode(['header' => $headers, 'data' => $data]);
             }
             exit;
         }
