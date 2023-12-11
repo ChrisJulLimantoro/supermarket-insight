@@ -115,8 +115,6 @@
         })
 
         $("#month").on('change',function(e){
-            console.log($(this).val());
-            console.log(instance);
             $.ajax({
             url : "./analytics.php",
             method : "POST",
@@ -125,7 +123,6 @@
                 filter : $(this).val()
             },
             success : function(res){
-                console.log(res)
                 res = JSON.parse(res)
                 let min = 3000000;
                 let max = 0;
