@@ -65,6 +65,11 @@
                             ":price" => $dataIn[4],
                             ":unit" => $dataIn[5]
                         ]);
+
+                        // insert into neo4j
+                        $result = $conn_neo->run(<<<CYPHER
+                            MERGE (p:Products {product_id: '$dataIn[0]'})
+                            CYPHER,['dbName' => 'neo4j']);
                         $data[] = $dataIn;
                     }
                 }
@@ -139,6 +144,12 @@
                             ":address" => $dataIn[3],
                             ":city" => $dataIn[4]
                         ]);
+
+                        // insert into neo4j
+                        $result = $conn_neo->run(<<<CYPHER
+                            MERGE (s:Stores {store_id: '$dataIn[0]'})
+                            CYPHER,['dbName' => 'neo4j']);
+                        
                         $data[] = $dataIn;
                     }
                 }
@@ -207,6 +218,11 @@
                             ":gender" => $dataIn[5],
                             ":join" => DateTime::createFromFormat("dd/mm/yyyy",$dataIn[6])
                         ]);
+
+                        // input to neo4j
+                        $result = $conn_neo->run(<<<CYPHER
+                            MERGE (c:Customers {customer_id: '$dataIn[0]'})
+                            CYPHER,['dbName' => 'neo4j']);
                         $data[] = $dataIn;
                     }
                 }
@@ -250,41 +266,90 @@
                 echo json_encode(['header' => $headers, 'data' => $data]);
             }else if($upload == "sales"){
                 // $file = $_FILES['file'];
+                $collectionCust = $conn_mongo->Ceje->cust_sales;
+                $collectionStore = $conn_mongo->Ceje->store_sales;
                 if ($handle !== false) {
+                    // Customer
+                    try {
+                        $sql = "SELECT * FROM customer";
+                        $stmt = $conn_sql->prepare($sql);
+                        $stmt->execute();
+                    } catch (PDOException $e) {
+                        echo json_encode(['error' => 'Belum input Customer!', 'code' => 400]);
+                        exit;
+                    }
+                    $resCust = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    // Product
+                    try {
+                        $sql = "SELECT * FROM product";
+                        $stmt = $conn_sql->prepare($sql);
+                        $stmt->execute();
+                    } catch (PDOException $e) {
+                        echo json_encode(['error' => 'Belum input Product!', 'code' => 400]);
+                        exit;
+                    }
+
+                    // Stores
+                    try {
+                        $sql = "SELECT * FROM store";
+                        $stmt = $conn_sql->prepare($sql);
+                        $stmt->execute();
+                    } catch (PDOException $e) {
+                        echo json_encode(['error' => 'Belum input Store!','code' => 400]);
+                        exit;
+                    }
+                    $resStore = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    // Sales
                     $headers = fgetcsv($handle, 0, ',');
-                    $collection = $conn_mongo->Ceje->delivery_to_store;
                     $data = [];
-                    $in = [];
+                    $dataStore = [];
+                    $dataCust = [];
                     // Process the remaining rows
                     while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
-                        if(!isset($in[$dataIn[0]])){
-                            $in[$dataIn[0]] = [];
+                        // NEO4J
+                        // $cypher = <<< CYPHER
+                        //     MATCH (s:Sales {sales_id: '$dataIn[1]'}),(p:Products {product_id:'$dataIn[5]'})
+                        //     CREATE (s)<-[b:SOLD_IN]-(p)
+                        //     SET b.quantity = '$dataIn[6]',b.sub_total = '$dataIn[7]'
+                        //     CYPHER;
+                        // $res = $conn_neo->run($cypher, ['dbName' => 'neo4j']);
+
+
+                        // $cypher = <<< CYPHER
+                        //     MERGE (c:Customers {customer_id: '$dataIn[3]'})-[a:TRANSACTION_IN]->(s:Sales {sales_id: '$dataIn[1]',date : '$dataIn[0]',rating : '$dataIn[8]'})-[d:HAPPENED_IN]->(st:Stores {store_id: '$dataIn[2]'})
+                        //     CYPHER;
+                        // $res = $conn_neo->run($cypher, ['dbName' => 'neo4j']);
+
+
+                        // MONGODB
+                        foreach($resCust as $r){
+                            if($r['customer_id'] != $dataIn[3]) continue; 
+                            if(!isset($dataCust[$r['customer_id']])) $dataCust[$r['customer_id']] = ['customer_id' => $r['customer_id']];
+                            if(!isset($dataCust[$r['customer_id']]['sales'])) $dataCust[$r['customer_id']]['sales'] = [];
+                            if(!isset($dataCust[$r['customer_id']]['sales'][$dataIn[1]])) $dataCust[$r['customer_id']]['sales'][$dataIn[1]] = ['date' => $dataIn[0] ,'total' => intval($dataIn[7])];
+                            else $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['total'] += intval($dataIn[7]);
                         }
-                        foreach($dataIn as $key => $value){
-                            if($headers[$key] == "product_id"){
-                                if(!isset($in[$dataIn[0]]["products"])){
-                                    $in[$dataIn[0]]["products"] = [['product_id' => $value, 'qty' => $dataIn[array_search('qty', $headers)]]];
-                                }else{
-                                    $in[$dataIn[0]]["products"][] = ['product_id' => $value, 'qty' => $dataIn[array_search('qty', $headers)]];
-                                }
-                            }else if($headers[$key] == "qty"){
-                                continue;
-                            }else{
-                                if(!isset($in[$dataIn[0]][$headers[$key]])){
-                                    $in[$dataIn[0]][$headers[$key]] = $value;
-                                }else{
-                                    continue;
-                                }
-                            }
+
+                        foreach($resStore as $r){
+                            if($r['store_id'] != $dataIn[2]) continue;
+                            if(!isset($dataStore[$r['store_id']])) $dataStore[$r['store_id']] = ['store_id' => $r['store_id']];
+                            if(!isset($dataStore[$r['store_id']]['sales'])) $dataStore[$r['store_id']]['sales'] = [];
+                            if(!isset($dataStore[$r['store_id']]['sales'][$dataIn[1]])) $dataStore[$r['store_id']]['sales'][$dataIn[1]] = ['date' => $dataIn[0] ,'total' => intval($dataIn[7])];
+                            else $dataStore[$r['store_id']]['sales'][$dataIn[1]]['total'] += intval($dataIn[7]);
                         }
-                        $data[] = $dataIn;
                     }
-                    foreach($in as $key => $value){
-                        $collection->insertOne($value);
+
+                    foreach ($dataCust as $key => $value){
+                        $collectionCust->insertOne($value);
                     }
-                    
+                    foreach ($dataStore as $key => $value){
+                        $collectionStore->insertOne($value);
+                    }
+                }else{
+                    echo "hello";
                 }
-                echo json_encode(['header' => $headers, 'data' => $data]);
+                echo json_encode(['cust' => $dataCust,'store' => $dataStore]);
             }else if($upload == "delivery-to-warehouse"){
                 // $file = $_FILES['file'];
                 if ($handle !== false) {

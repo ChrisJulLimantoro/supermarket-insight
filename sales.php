@@ -105,6 +105,7 @@
                         console.log(res);
                         $("#input-form").attr("hidden",true);
                         res = JSON.parse(res);
+                        console.log(res);
                         let data = {
                                 columns: res.header,
                                 rows: res.data,
