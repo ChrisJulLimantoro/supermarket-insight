@@ -268,6 +268,7 @@
                 // $file = $_FILES['file'];
                 $collectionCust = $conn_mongo->Ceje->cust_sales;
                 $collectionStore = $conn_mongo->Ceje->store_sales;
+                $collectionProd = $conn_mongo->Ceje->prod_sales;
                 if ($handle !== false) {
                     // Customer
                     try {
@@ -288,6 +289,7 @@
                         echo json_encode(['error' => 'Belum input Product!', 'code' => 400]);
                         exit;
                     }
+                    $resProd = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     // Stores
                     try {
@@ -305,6 +307,7 @@
                     $data = [];
                     $dataStore = [];
                     $dataCust = [];
+                    $dataProd = [];
                     // Process the remaining rows
                     while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
                         // NEO4J
@@ -323,20 +326,36 @@
 
 
                         // MONGODB
+                        // customer base
                         foreach($resCust as $r){
                             if($r['customer_id'] != $dataIn[3]) continue; 
                             if(!isset($dataCust[$r['customer_id']])) $dataCust[$r['customer_id']] = ['customer_id' => $r['customer_id']];
                             if(!isset($dataCust[$r['customer_id']]['sales'])) $dataCust[$r['customer_id']]['sales'] = [];
                             if(!isset($dataCust[$r['customer_id']]['sales'][$dataIn[1]])) $dataCust[$r['customer_id']]['sales'][$dataIn[1]] = ['date' => $dataIn[0] ,'total' => intval($dataIn[7])];
                             else $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['total'] += intval($dataIn[7]);
+                            if(!isset($dataCust[$r['customer_id']]['sales'][$dataIn[1]]['products'])) $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['products'] = [['quantity' => intval($dataIn[6]), 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]]];
+                            else $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['products'][] = ['quantity' => $dataIn[6], 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]];
                         }
 
+                        // store base
                         foreach($resStore as $r){
                             if($r['store_id'] != $dataIn[2]) continue;
                             if(!isset($dataStore[$r['store_id']])) $dataStore[$r['store_id']] = ['store_id' => $r['store_id']];
                             if(!isset($dataStore[$r['store_id']]['sales'])) $dataStore[$r['store_id']]['sales'] = [];
                             if(!isset($dataStore[$r['store_id']]['sales'][$dataIn[1]])) $dataStore[$r['store_id']]['sales'][$dataIn[1]] = ['date' => $dataIn[0] ,'total' => intval($dataIn[7])];
                             else $dataStore[$r['store_id']]['sales'][$dataIn[1]]['total'] += intval($dataIn[7]);
+                            if(!isset($dataStore[$r['store_id']]['sales'][$dataIn[1]]['products'])) $dataStore[$r['store_id']]['sales'][$dataIn[1]]['products'] = [['quantity' => intval($dataIn[6]), 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]]];
+                            else $dataStore[$r['store_id']]['sales'][$dataIn[1]]['products'][] = ['quantity' => intval($dataIn[6]), 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]];
+                        }
+
+                        // product base
+                        foreach($resProd as $r){
+                            if($r['product_id'] != $dataIn[5]) continue;
+                            if(!isset($dataProd[$r['product_id']])) $dataProd[$r['product_id']] = ['product_id' => $r['product_id']];
+                            if(!isset($dataProd[$r['product_id']]['stores'])) $dataProd[$r['product_id']]['stores'] = [];
+                            if(!isset($dataProd[$r['product_id']]['stores'][$dataIn[2]])) $dataProd[$r['product_id']]['stores'][$dataIn[2]] = ['store_id' => $dataIn[2]];
+                            if(!isset($dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'])) $dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'] = [];
+                            if(!isset($dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'][$dataIn[1]])) $dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'][$dataIn[1]] = ['date' => $dataIn[0], 'quantity' => intval($dataIn[6])];
                         }
                     }
 
@@ -345,6 +364,9 @@
                     }
                     foreach ($dataStore as $key => $value){
                         $collectionStore->insertOne($value);
+                    }
+                    foreach ($dataProd as $key => $value){
+                        $collectionProd->insertOne($value);
                     }
                 }else{
                     echo "hello";
