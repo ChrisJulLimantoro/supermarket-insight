@@ -29,6 +29,29 @@
                         '$limit' => 5
                     ]
                 ];
+                $pipelineTotalSales = [
+                    [
+                        '$project' => [
+                            'customer_id' => 1,
+                            'sales' => ['$objectToArray' => '$sales']
+                        ]
+                    ],
+                    [
+                        '$unwind' => '$sales'
+                    ],
+                    [
+                        '$group' => [
+                            '_id' => '$customer_id',
+                            'totalCombined' => ['$sum' => '$sales.v.total']
+                        ]
+                    ],
+                    [
+                        '$group' => [
+                            '_id' => null,
+                            'totalSalesAllCustomers' => ['$sum' => '$totalCombined']
+                        ]
+                    ]
+                ];
             }else{
                 if(!isset($_POST['filter']['product'])){
                     $pipeline = [
@@ -64,6 +87,34 @@
                         ],
                         [
                             '$limit' => 5
+                        ]
+                    ];
+                    $pipelineTotalSales = [
+                        [
+                            '$project' => [
+                                'customer_id' => 1,
+                                'sales' => ['$objectToArray' => '$sales']
+                            ]
+                        ],
+                        [
+                            '$unwind' => '$sales'
+                        ],
+                        [
+                            '$match' => [
+                                'sales.v.date' => ['$regex' => '^(?:' . implode('|', $_POST['filter']['month']) . ')\/'], // Filter by selected months (January and February)
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => '$customer_id',
+                                'totalCombined' => ['$sum' => '$sales.v.total']
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalSalesAllCustomers' => ['$sum' => '$totalCombined']
+                            ]
                         ]
                     ];
                 }else if(!isset($_POST['filter']['month'])){
@@ -109,7 +160,36 @@
                             '$limit' => 5
                         ]
                     ];
-                    
+                    $pipelineTotalSales = [
+                        [
+                            '$project' => [
+                                'customer_id' => 1,
+                                'sales' => ['$objectToArray' => '$sales']
+                            ]
+                        ],
+                        [
+                            '$unwind' => '$sales'
+                        ],
+                        [
+                            '$match' => [
+                                "sales.v.products" => [
+                                    '$elemMatch' => [ 'product_id' => [ '$in' => $_POST['filter']['product'] ] ] // Replace with your selected product IDs
+                                ]
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => '$customer_id',
+                                'totalCombined' => ['$sum' => '$sales.v.total']
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalSalesAllCustomers' => ['$sum' => '$totalCombined']
+                            ]
+                        ]
+                    ];
                 }else{
                     $pipeline = [
                         [
@@ -174,14 +254,49 @@
                             '$limit' => 5
                         ]
                     ];
-                    
+                    $pipelineTotalSales = [
+                        [
+                            '$project' => [
+                                'customer_id' => 1,
+                                'sales' => ['$objectToArray' => '$sales']
+                            ]
+                        ],
+                        [
+                            '$unwind' => '$sales'
+                        ],
+                        [
+                            '$match' => [
+                                'sales.v.date' => ['$regex' => '^(?:' . implode('|', $_POST['filter']['month']) . ')\/'], // Filter by selected months (January and February)
+                                "sales.v.products" => [
+                                    '$elemMatch' => [ 'product_id' => [ '$in' => $_POST['filter']['product'] ] ] // Replace with your selected product IDs
+                                ]
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => '$customer_id',
+                                'totalCombined' => ['$sum' => '$sales.v.total']
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalSalesAllCustomers' => ['$sum' => '$totalCombined']
+                            ]
+                        ]
+                    ];
                 }
             }
             
             // Execute aggregation pipeline
             $result = $collectionCust->aggregate($pipeline);
+            $all = $collectionCust->aggregate($pipelineTotalSales);
             $x = [];
             $y = [];
+            $z = 0;
+            foreach($all as $a){
+                $z = $a['totalSalesAllCustomers'];
+            }
             foreach ($result as $r){
                 $mysql = "SELECT first_name,last_name FROM customer WHERE customer_id = :id";
                 $stmt = $conn_sql->prepare($mysql);
@@ -191,7 +306,7 @@
                 $x[] = $name[0]['first_name'].' '.$name[0]['last_name'];
                 $y[] = $r['totalCombined'];
             }
-            echo json_encode(['x' => $x, 'y' => $y]);
+            echo json_encode(['x' => $x, 'y' => $y, 'z' => $z]);
             exit;
         }else if($_POST['ajax'] == 'b'){
             $collectionProd = $conn_mongo->Ceje->prod_sales;
@@ -220,7 +335,33 @@
                     ],
                     ['$sort' => ['totalQuantity' => -1]],
                     ['$limit' => 5],
-                ];                
+                ];   
+                // Pipeline to calculate total quantity across all documents
+                $pipelineTotalQuantity = [
+                    [
+                        '$project' => [
+                            'stores' => ['$objectToArray' => '$stores'],
+                        ],
+                    ],
+                    ['$unwind' => '$stores'],
+                    [
+                        '$addFields' => [
+                            'allQuantity' => [
+                                '$reduce' => [
+                                    'input' => ['$objectToArray' => '$stores.v.sales'],
+                                    'initialValue' => 0,
+                                    'in' => ['$add' => ['$$value', '$$this.v.quantity']],
+                                ],
+                            ],
+                        ],
+                    ],
+                    [
+                        '$group' => [
+                            '_id' => null,
+                            'totalAllQuantity' => ['$sum' => '$allQuantity'],
+                        ],
+                    ],
+                ];             
             }else{
                 if(!isset($_POST['filter']['month']) && !isset($_POST['filter']['category'])){
                     $pipeline = [
@@ -248,6 +389,32 @@
                         ],
                         ['$sort' => ['totalQuantity' => -1]],
                         ['$limit' => 5],
+                    ];
+                    $pipelineTotalQuantity = [
+                        [
+                            '$project' => [
+                                'stores' => ['$objectToArray' => '$stores'],
+                                'product_id' => 1,
+                            ],
+                        ],
+                        ['$unwind' => '$stores'],
+                        [
+                            '$project' => [
+                                'product_id' => 1,
+                                'store_id' => '$stores.v.store_id',
+                                'sales' => ['$objectToArray' => '$stores.v.sales'],
+                            ],
+                        ],
+                        ['$unwind' => '$sales'],
+                        ['$match' => [
+                            'store_id' => ['$in' => $_POST['filter']['store']], // Filter by selected store IDs
+                        ]],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalAllQuantity' => ['$sum' => '$sales.v.quantity'],
+                            ],
+                        ],
                     ];
                 }else if(!isset($_POST['filter']['store']) && !isset($_POST['filter']['category'])){
                     $pipeline = [
@@ -277,6 +444,32 @@
                         ],
                         ['$sort' => ['totalQuantity' => -1]],
                         ['$limit' => 5],
+                    ];
+                    $pipelineTotalQuantity = [
+                        [
+                            '$project' => [
+                                'stores' => ['$objectToArray' => '$stores'],
+                                'product_id' => 1,
+                            ],
+                        ],
+                        ['$unwind' => '$stores'],
+                        [
+                            '$project' => [
+                                'product_id' => 1,
+                                'store_id' => '$stores.v.store_id',
+                                'sales' => ['$objectToArray' => '$stores.v.sales'],
+                            ],
+                        ],
+                        ['$unwind' => '$sales'],
+                        ['$match' => [
+                            'sales.v.date' => ['$regex' => '^(?:' . implode('|', $_POST['filter']['month']) . ')\/'], // Filter by selected months
+                        ]],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalAllQuantity' => ['$sum' => '$sales.v.quantity'],
+                            ],
+                        ],
                     ];
                 }else if(!isset($_POST['filter']['store']) && !isset($_POST['filter']['month'])){
                     $prod = [];
@@ -321,6 +514,32 @@
                         ['$sort' => ['totalQuantity' => -1]],
                         ['$limit' => 5],
                     ];
+                    $pipelineTotalQuantity = [
+                        [
+                            '$project' => [
+                                'stores' => ['$objectToArray' => '$stores'],
+                                'product_id' => 1,
+                            ],
+                        ],
+                        ['$unwind' => '$stores'],
+                        [
+                            '$project' => [
+                                'product_id' => 1,
+                                'store_id' => '$stores.v.store_id',
+                                'sales' => ['$objectToArray' => '$stores.v.sales'],
+                            ],
+                        ],
+                        ['$unwind' => '$sales'],
+                        ['$match' => [
+                            'product_id' => ['$in' => $prod], // Filter by selected product IDs
+                        ]],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalAllQuantity' => ['$sum' => '$sales.v.quantity'],
+                            ],
+                        ],
+                    ];
                 }else if(!isset($_POST['filter']['category'])){
                     $pipeline = [
                         [
@@ -350,6 +569,33 @@
                         ],
                         ['$sort' => ['totalQuantity' => -1]],
                         ['$limit' => 5],
+                    ];
+                    $pipelineTotalQuantity = [
+                        [
+                            '$project' => [
+                                'stores' => ['$objectToArray' => '$stores'],
+                                'product_id' => 1,
+                            ],
+                        ],
+                        ['$unwind' => '$stores'],
+                        [
+                            '$project' => [
+                                'product_id' => 1,
+                                'store_id' => '$stores.v.store_id',
+                                'sales' => ['$objectToArray' => '$stores.v.sales'],
+                            ],
+                        ],
+                        ['$unwind' => '$sales'],
+                        ['$match' => [
+                            'store_id' => ['$in' => $_POST['filter']['store']], // Filter by selected store IDs
+                            'sales.v.date' => ['$regex' => '^(?:' . implode('|', $_POST['filter']['month']) . ')\/'], // Filter by selected months
+                        ]],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalAllQuantity' => ['$sum' => '$sales.v.quantity'],
+                            ],
+                        ],
                     ];
                 }else if(!isset($_POST['filter']['month'])){
                     $prod = [];
@@ -394,6 +640,33 @@
                         ],
                         ['$sort' => ['totalQuantity' => -1]],
                         ['$limit' => 5],
+                    ];
+                    $pipelineTotalQuantity = [
+                        [
+                            '$project' => [
+                                'stores' => ['$objectToArray' => '$stores'],
+                                'product_id' => 1,
+                            ],
+                        ],
+                        ['$unwind' => '$stores'],
+                        [
+                            '$project' => [
+                                'product_id' => 1,
+                                'store_id' => '$stores.v.store_id',
+                                'sales' => ['$objectToArray' => '$stores.v.sales'],
+                            ],
+                        ],
+                        ['$unwind' => '$sales'],
+                        ['$match' => [
+                            'store_id' => ['$in' => $_POST['filter']['store']], // Filter by selected store IDs
+                            'product_id' => ['$in' => $prod], // Filter by selected product IDs
+                        ]],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalAllQuantity' => ['$sum' => '$sales.v.quantity'],
+                            ],
+                        ],
                     ];
                 }else if(!isset($_POST['filter']['store'])){
                     $prod = [];
@@ -439,6 +712,33 @@
                         ['$sort' => ['totalQuantity' => -1]],
                         ['$limit' => 5],
                     ];
+                    $pipelineTotalQuantity = [
+                        [
+                            '$project' => [
+                                'stores' => ['$objectToArray' => '$stores'],
+                                'product_id' => 1,
+                            ],
+                        ],
+                        ['$unwind' => '$stores'],
+                        [
+                            '$project' => [
+                                'product_id' => 1,
+                                'store_id' => '$stores.v.store_id',
+                                'sales' => ['$objectToArray' => '$stores.v.sales'],
+                            ],
+                        ],
+                        ['$unwind' => '$sales'],
+                        ['$match' => [
+                            'sales.v.date' => ['$regex' => '^(?:' . implode('|', $_POST['filter']['month']) . ')\/'], // Filter by selected months
+                            'product_id' => ['$in' => $prod], // Filter by selected product IDs
+                        ]],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalAllQuantity' => ['$sum' => '$sales.v.quantity'],
+                            ],
+                        ],
+                    ];
                 }else{
                     $prod = [];
                     foreach($_POST['filter']['category'] as $c){
@@ -470,11 +770,13 @@
                             ],
                         ],
                         ['$unwind' => '$sales'],
-                        ['$match' => [
-                            'store_id' => ['$in' => $_POST['filter']['store']],
-                            'sales.v.date' => ['$regex' => '^(' . implode('|', $_POST['filter']['month']) . ')\/'],
-                            'product_id' => ['$in' => $prod],
-                        ]], // Filter by selected store IDs, months, and product IDs
+                        [
+                            '$match' => [
+                                'store_id' => ['$in' => $_POST['filter']['store']],
+                                'sales.v.date' => ['$regex' => '^(' . implode('|', $_POST['filter']['month']) . ')\/'],
+                                'product_id' => ['$in' => $prod],
+                            ],
+                        ], // Filter by selected store IDs, months, and product IDs
                         [
                             '$group' => [
                                 '_id' => '$product_id',
@@ -484,11 +786,44 @@
                         ['$sort' => ['totalQuantity' => -1]],
                         ['$limit' => 5],
                     ];
+                    $pipelineTotalQuantity = [
+                        [
+                            '$project' => [
+                                'stores' => ['$objectToArray' => '$stores'],
+                                'product_id' => 1,
+                            ],
+                        ],
+                        ['$unwind' => '$stores'],
+                        [
+                            '$project' => [
+                                'product_id' => 1,
+                                'store_id' => '$stores.v.store_id',
+                                'sales' => ['$objectToArray' => '$stores.v.sales'],
+                            ],
+                        ],
+                        ['$unwind' => '$sales'],
+                        ['$match' => [
+                            'store_id' => ['$in' => $_POST['filter']['store']], // Filter by selected store IDs
+                            'sales.v.date' => ['$regex' => '^(?:' . implode('|', $_POST['filter']['month']) . ')\/'], // Filter by selected months
+                            'product_id' => ['$in' => $prod], // Filter by selected product IDs
+                        ]],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalAllQuantity' => ['$sum' => '$sales.v.quantity'],
+                            ],
+                        ],
+                    ];
                 }
             }
             $result = $collectionProd->aggregate($pipeline);
+            $all = $collectionProd->aggregate($pipelineTotalQuantity);
             $x = [];
             $y = [];
+            $z = 0;
+            foreach($all as $d){
+                $z = $d['totalAllQuantity'];
+            }
             foreach($result as $r){
                 $mysql = "SELECT name FROM product WHERE product_id = :id";
                 $stmt = $conn_sql->prepare($mysql);
@@ -499,7 +834,7 @@
                 $x[] = substr($name,0,12);
                 $y[] = $r['totalQuantity'];
             }
-            echo json_encode(['x' => $x, 'y' => $y]);
+            echo json_encode(['x' => $x, 'y' => $y, 'z' => $z]);
             exit;
         }else if($_POST['ajax'] == 'c'){
             $collectionStore = $conn_mongo->Ceje->store_sales;
@@ -525,6 +860,29 @@
                     ],
                     [
                         '$limit' => 5
+                    ]
+                ];
+                $pipelineTotalSales = [
+                    [
+                        '$project' => [
+                            'store-id' => 1,
+                            'sales' => ['$objectToArray' => '$sales']
+                        ]
+                    ],
+                    [
+                        '$unwind' => '$sales'
+                    ],
+                    [
+                        '$group' => [
+                            '_id' => '$store-id',
+                            'totalCombined' => ['$sum' => '$sales.v.total']
+                        ]
+                    ],
+                    [
+                        '$group' => [
+                            '_id' => null,
+                            'totalSalesAllStores' => ['$sum' => '$totalCombined']
+                        ]
                     ]
                 ];
             }else{
@@ -562,6 +920,34 @@
                         ],
                         [
                             '$limit' => 5
+                        ]
+                    ];
+                    $pipelineTotalSales = [
+                        [
+                            '$project' => [
+                                'store_id' => 1,
+                                'sales' => ['$objectToArray' => '$sales']
+                            ]
+                        ],
+                        [
+                            '$unwind' => '$sales'
+                        ],
+                        [
+                            '$match' => [
+                                'sales.v.date' => ['$regex' => '^(?:' . implode('|', $_POST['filter']['month']) . ')\/'], // Filter by selected months (January and February)
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => '$store_id',
+                                'totalCombined' => ['$sum' => '$sales.v.total']
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalSalesAllStores' => ['$sum' => '$totalCombined']
+                            ]
                         ]
                     ];
                 }else if(!isset($_POST['filter']['month'])){
@@ -607,7 +993,36 @@
                             '$limit' => 5
                         ]
                     ];
-                    
+                    $pipelineTotalSales = [
+                        [
+                            '$project' => [
+                                'store_id' => 1,
+                                'sales' => ['$objectToArray' => '$sales']
+                            ]
+                        ],
+                        [
+                            '$unwind' => '$sales'
+                        ],
+                        [
+                            '$match' => [
+                                "sales.v.products" => [
+                                    '$elemMatch' => [ 'product_id' => [ '$in' => $_POST['filter']['product'] ] ] // Replace with your selected product IDs
+                                ]
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => '$store_id',
+                                'totalCombined' => ['$sum' => '$sales.v.total']
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalSalesAllStores' => ['$sum' => '$totalCombined']
+                            ]
+                        ]
+                    ];
                 }else{
                     $pipeline = [
                         [
@@ -672,14 +1087,49 @@
                             '$limit' => 5
                         ]
                     ];
-                    
+                    $pipelineTotalSales = [
+                        [
+                            '$project' => [
+                                'store_id' => 1,
+                                'sales' => ['$objectToArray' => '$sales']
+                            ]
+                        ],
+                        [
+                            '$unwind' => '$sales'
+                        ],
+                        [
+                            '$match' => [
+                                'sales.v.date' => ['$regex' => '^(?:' . implode('|', $_POST['filter']['month']) . ')\/'], // Filter by selected months (January and February)
+                                "sales.v.products" => [
+                                    '$elemMatch' => [ 'product_id' => [ '$in' => $_POST['filter']['product'] ] ] // Replace with your selected product IDs
+                                ]
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => '$store_id',
+                                'totalCombined' => ['$sum' => '$sales.v.total']
+                            ]
+                        ],
+                        [
+                            '$group' => [
+                                '_id' => null,
+                                'totalSalesAllStores' => ['$sum' => '$totalCombined']
+                            ]
+                        ]
+                    ];
                 }
             }
             
             // Execute aggregation pipeline
             $result = $collectionStore->aggregate($pipeline);
+            $all = $collectionStore->aggregate($pipelineTotalSales);
             $x = [];
             $y = [];
+            $z = 0;
+            foreach($all as $a){
+                $z = $a['totalSalesAllStores'];
+            }
             foreach ($result as $r){
                 $mysql = "SELECT name FROM store WHERE store_id = :id";
                 $stmt = $conn_sql->prepare($mysql);
@@ -688,7 +1138,7 @@
                 $x[] = $name;
                 $y[] = $r['totalCombined'];
             }
-            echo json_encode(['x' => $x, 'y' => $y]);
+            echo json_encode(['x' => $x, 'y' => $y,'z' => $z]);
             exit;
         }
     }

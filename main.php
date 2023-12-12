@@ -13,8 +13,8 @@
                 <h1 class="text-center uppercase font-bold text-3xl">Supermarket Insight</h1>
             </div>
             <div class="grid grid-cols-8 gap-4">
-                <div class="col-span-3 h-full items-center flex">
-                    <div class="flex flex-col w-full h-56 rounded-lg shadow-xl items-center justify-center p-5">
+                <div class="col-span-3 h-full items-center flex flex-col">
+                    <div class="flex flex-col w-full h-full rounded-lg shadow-xl items-center justify-center p-5">
                         <h1 class="text-center uppercase font-bold text-2xl mb-2">Filter Top 5 Store</h1>
                         <div class="grid grid-rows-2 gap-4">
                             <div class="w-full">
@@ -48,6 +48,10 @@
                             </div>
                         </div>
                     </div>
+                    <div class="flex flex-col w-full h-56 rounded-lg shadow-xl items-center justify-center p-5">
+                        <div class="text-center uppercase font-bold text-3xl mb-3" id="all"></div>
+                        <div class="text-center uppercase text-lg">Total Sales</div>
+                    </div>
                 </div>
                 <div class="col-span-5">
                     <div class="flex flex-col w-full h-full rounded-lg shadow-xl items-center justify-center p-5">
@@ -65,8 +69,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-span-3 h-full flex items-center">
-                    <div class="flex flex-col w-full h-56 rounded-lg shadow-xl items-center justify-center p-5">
+                <div class="col-span-3 h-full flex flex-col items-center">
+                    <div class="flex flex-col w-full h-full rounded-lg shadow-xl items-center justify-center p-5">
                         <h1 class="text-center uppercase font-bold text-2xl mb-2">Filter Top 5 Customer</h1>
                         <div class="grid grid-rows-2 gap-4">
                             <div class="w-full">
@@ -100,9 +104,13 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-span-3 h-full flex items-center">
                     <div class="flex flex-col w-full h-56 rounded-lg shadow-xl items-center justify-center p-5">
+                        <div class="text-center uppercase font-bold text-3xl mb-3" id="all-2"></div>
+                        <div class="text-center uppercase text-lg">Total Sales</div>
+                    </div>
+                </div>
+                <div class="col-span-3 h-full flex items-center flex-col">
+                    <div class="flex flex-col w-full h-full rounded-lg shadow-xl items-center justify-center p-5">
                         <h1 class="text-center uppercase font-bold text-2xl mb-2">Filter Top 5 Product</h1>
                         <div class="grid grid-rows-3 gap-2">
                             <div class="w-full">
@@ -148,6 +156,10 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+                    <div class="flex flex-col w-full h-56 rounded-lg shadow-xl items-center justify-center p-5">
+                        <div class="text-center uppercase font-bold text-3xl mb-3" id="all-3"></div>
+                        <div class="text-center uppercase text-lg">Total Quantity of Product Sold</div>
                     </div>
                 </div>
                 <div class="col-span-5">
@@ -389,6 +401,7 @@
                 //     existingInstance.destroy();
                 // }
                 $("#canvas-2").html("<canvas id='chart-options-example-2'></canvas>");
+                $("#all-2").text(convertToDollarValue(res.z));
                 new te.Chart(
                     document.getElementById('chart-options-example-2'),
                     dataChartOptionsExample,
@@ -466,6 +479,7 @@
                 data : dataAjax,
                 success : function(res){
                     res = JSON.parse(res)
+                    console.log(res)
                     let min = 3000000;
                     let max = 0;
                     Object.entries(res.y).forEach(([key, value]) => {
@@ -537,6 +551,7 @@
                     },
                     };
                     $("#canvas-3").html("<canvas id='chart-options-example-3'></canvas>");
+                    $("#all-3").text(res.z.toLocaleString('en-US'));
                     new te.Chart(
                         document.getElementById('chart-options-example-3'),
                         dataChartOptionsExample,
@@ -660,6 +675,7 @@
                     },
                     };
                     $("#canvas").html("<canvas id='chart-options-example'></canvas>");
+                    $("#all").text(convertToDollarValue(res.z));
                     new te.Chart(
                         document.getElementById('chart-options-example'),
                         dataChartOptionsExample,
@@ -667,6 +683,13 @@
                     );
                 }
             })
+        }
+        function convertToDollarValue(number) {
+            // Convert number to string and split into parts for formatting
+            let temp = number.toLocaleString('en-US')
+
+            // Add '$' sign and concatenate parts
+            return '$ ' + temp;
         }
 
     })
