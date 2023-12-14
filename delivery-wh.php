@@ -105,7 +105,7 @@
                         console.log(res);
                         res = JSON.parse(res);
                         if(res.header[0] != "data"){
-                            $("#input-form").attr("hidden",true);
+                            // $("#input-form").attr("hidden",true);
                         }
                         let data = {
                                 columns: res.header,
