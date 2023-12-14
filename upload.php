@@ -310,7 +310,25 @@
                     $dataProd = [];
                     // Process the remaining rows
                     while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
+                        // Date
+                        $oriDate = $dataIn[0];
+                        $dateTime = DateTime::createFromFormat('m/d/Y', $oriDate);
+                        $formattedDate = $dateTime->format('Y-m-d');
+
                         // NEO4J
+                        $cypher = <<< CYPHER
+                            MERGE (c:Customer {customer_id: '$dataIn[3]'})
+                            MERGE (s:Store {store_id: '$dataIn[2]'})
+                            MERGE (sal:Sales {sales_id: '$dataIn[1]', date:date('$formattedDate'), rating:$dataIn[8]})
+                            MERGE (p:Product {product_id: '$dataIn[5]'})
+                            MERGE (c)<-[:MADE_BY]-(sal)
+                            MERGE (sal)<-[r:SOLD_IN]-(p)
+                            ON CREATE SET r.quantity = $dataIn[6], r.subtotal = $dataIn[7]
+                            MERGE (s)<-[:PROCESSED_AT]-(sal)
+                            CYPHER;
+                        $res = $conn_neo->run($cypher, ['dbName' => 'neo4j']);
+
+                        
                         // $cypher = <<< CYPHER
                         //     MATCH (s:Sales {sales_id: '$dataIn[1]'}),(p:Products {product_id:'$dataIn[5]'})
                         //     CREATE (s)<-[b:SOLD_IN]-(p)
@@ -325,49 +343,49 @@
                         // $res = $conn_neo->run($cypher, ['dbName' => 'neo4j']);
 
 
-                        // MONGODB
-                        // customer base
-                        foreach($resCust as $r){
-                            if($r['customer_id'] != $dataIn[3]) continue; 
-                            if(!isset($dataCust[$r['customer_id']])) $dataCust[$r['customer_id']] = ['customer_id' => $r['customer_id']];
-                            if(!isset($dataCust[$r['customer_id']]['sales'])) $dataCust[$r['customer_id']]['sales'] = [];
-                            if(!isset($dataCust[$r['customer_id']]['sales'][$dataIn[1]])) $dataCust[$r['customer_id']]['sales'][$dataIn[1]] = ['date' => $dataIn[0] ,'total' => intval($dataIn[7])];
-                            else $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['total'] += intval($dataIn[7]);
-                            if(!isset($dataCust[$r['customer_id']]['sales'][$dataIn[1]]['products'])) $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['products'] = [['quantity' => intval($dataIn[6]), 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]]];
-                            else $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['products'][] = ['quantity' => $dataIn[6], 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]];
-                        }
+                        // // MONGODB
+                        // // customer base
+                        // foreach($resCust as $r){
+                        //     if($r['customer_id'] != $dataIn[3]) continue; 
+                        //     if(!isset($dataCust[$r['customer_id']])) $dataCust[$r['customer_id']] = ['customer_id' => $r['customer_id']];
+                        //     if(!isset($dataCust[$r['customer_id']]['sales'])) $dataCust[$r['customer_id']]['sales'] = [];
+                        //     if(!isset($dataCust[$r['customer_id']]['sales'][$dataIn[1]])) $dataCust[$r['customer_id']]['sales'][$dataIn[1]] = ['date' => $dataIn[0] ,'total' => intval($dataIn[7])];
+                        //     else $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['total'] += intval($dataIn[7]);
+                        //     if(!isset($dataCust[$r['customer_id']]['sales'][$dataIn[1]]['products'])) $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['products'] = [['quantity' => intval($dataIn[6]), 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]]];
+                        //     else $dataCust[$r['customer_id']]['sales'][$dataIn[1]]['products'][] = ['quantity' => $dataIn[6], 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]];
+                        // }
 
-                        // store base
-                        foreach($resStore as $r){
-                            if($r['store_id'] != $dataIn[2]) continue;
-                            if(!isset($dataStore[$r['store_id']])) $dataStore[$r['store_id']] = ['store_id' => $r['store_id']];
-                            if(!isset($dataStore[$r['store_id']]['sales'])) $dataStore[$r['store_id']]['sales'] = [];
-                            if(!isset($dataStore[$r['store_id']]['sales'][$dataIn[1]])) $dataStore[$r['store_id']]['sales'][$dataIn[1]] = ['date' => $dataIn[0] ,'total' => intval($dataIn[7])];
-                            else $dataStore[$r['store_id']]['sales'][$dataIn[1]]['total'] += intval($dataIn[7]);
-                            if(!isset($dataStore[$r['store_id']]['sales'][$dataIn[1]]['products'])) $dataStore[$r['store_id']]['sales'][$dataIn[1]]['products'] = [['quantity' => intval($dataIn[6]), 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]]];
-                            else $dataStore[$r['store_id']]['sales'][$dataIn[1]]['products'][] = ['quantity' => intval($dataIn[6]), 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]];
-                        }
+                        // // store base
+                        // foreach($resStore as $r){
+                        //     if($r['store_id'] != $dataIn[2]) continue;
+                        //     if(!isset($dataStore[$r['store_id']])) $dataStore[$r['store_id']] = ['store_id' => $r['store_id']];
+                        //     if(!isset($dataStore[$r['store_id']]['sales'])) $dataStore[$r['store_id']]['sales'] = [];
+                        //     if(!isset($dataStore[$r['store_id']]['sales'][$dataIn[1]])) $dataStore[$r['store_id']]['sales'][$dataIn[1]] = ['date' => $dataIn[0] ,'total' => intval($dataIn[7])];
+                        //     else $dataStore[$r['store_id']]['sales'][$dataIn[1]]['total'] += intval($dataIn[7]);
+                        //     if(!isset($dataStore[$r['store_id']]['sales'][$dataIn[1]]['products'])) $dataStore[$r['store_id']]['sales'][$dataIn[1]]['products'] = [['quantity' => intval($dataIn[6]), 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]]];
+                        //     else $dataStore[$r['store_id']]['sales'][$dataIn[1]]['products'][] = ['quantity' => intval($dataIn[6]), 'sub_total' => intval($dataIn[7]), 'product_id' => $dataIn[5]];
+                        // }
 
-                        // product base
-                        foreach($resProd as $r){
-                            if($r['product_id'] != $dataIn[5]) continue;
-                            if(!isset($dataProd[$r['product_id']])) $dataProd[$r['product_id']] = ['product_id' => $r['product_id']];
-                            if(!isset($dataProd[$r['product_id']]['stores'])) $dataProd[$r['product_id']]['stores'] = [];
-                            if(!isset($dataProd[$r['product_id']]['stores'][$dataIn[2]])) $dataProd[$r['product_id']]['stores'][$dataIn[2]] = ['store_id' => $dataIn[2]];
-                            if(!isset($dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'])) $dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'] = [];
-                            if(!isset($dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'][$dataIn[1]])) $dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'][$dataIn[1]] = ['date' => $dataIn[0], 'quantity' => intval($dataIn[6])];
-                        }
+                        // // product base
+                        // foreach($resProd as $r){
+                        //     if($r['product_id'] != $dataIn[5]) continue;
+                        //     if(!isset($dataProd[$r['product_id']])) $dataProd[$r['product_id']] = ['product_id' => $r['product_id']];
+                        //     if(!isset($dataProd[$r['product_id']]['stores'])) $dataProd[$r['product_id']]['stores'] = [];
+                        //     if(!isset($dataProd[$r['product_id']]['stores'][$dataIn[2]])) $dataProd[$r['product_id']]['stores'][$dataIn[2]] = ['store_id' => $dataIn[2]];
+                        //     if(!isset($dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'])) $dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'] = [];
+                        //     if(!isset($dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'][$dataIn[1]])) $dataProd[$r['product_id']]['stores'][$dataIn[2]]['sales'][$dataIn[1]] = ['date' => $dataIn[0], 'quantity' => intval($dataIn[6])];
+                        // }
                     }
 
-                    foreach ($dataCust as $key => $value){
-                        $collectionCust->insertOne($value);
-                    }
-                    foreach ($dataStore as $key => $value){
-                        $collectionStore->insertOne($value);
-                    }
-                    foreach ($dataProd as $key => $value){
-                        $collectionProd->insertOne($value);
-                    }
+                    // foreach ($dataCust as $key => $value){
+                    //     $collectionCust->insertOne($value);
+                    // }
+                    // foreach ($dataStore as $key => $value){
+                    //     $collectionStore->insertOne($value);
+                    // }
+                    // foreach ($dataProd as $key => $value){
+                    //     $collectionProd->insertOne($value);
+                    // }
                 }else{
                     echo "hello";
                 }
@@ -381,6 +399,29 @@
                     $in = [];
                     // Process the remaining rows
                     while (($dataIn = fgetcsv($handle, 0, ',')) !== false) {
+                        // Date
+                        $orderDate = $dataIn[1];
+                        $dateTime = DateTime::createFromFormat('m/d/Y', $orderDate);
+                        $formattedOrderDate = $dateTime->format('Y-m-d');
+
+                        $arrivalDate = $dataIn[1];
+                        $dateTime = DateTime::createFromFormat('m/d/Y', $arrivalDate);
+                        $formattedArrivalrDate = $dateTime->format('Y-m-d');
+
+                        // Neo4j
+                        $cypher = <<< CYPHER
+                            MERGE (p:Product {product_id: '$dataIn[5]'})
+                            MERGE (s:Supplier {supplier_id: '$dataIn[3]'})
+                            MERGE (w:Warehouse {warehouse_id: '$dataIn[4]'})
+                            MERGE (d:Delivery {delivery_id: '$dataIn[0]', order_date:date('$formattedOrderDate'), arrival_date:date('$formattedArrivalrDate')})
+                            MERGE (w)<-[:DELIVERED_TO]-(p)
+                            MERGE (p)-[r:DELIVERED_AT]->(d)
+                            ON CREATE SET r.quantity = $dataIn[7], r.unit_price = $dataIn[6]
+                            MERGE (s)<-[:PROCESSED_AT]-(d)
+                            CYPHER;
+                        $res = $conn_neo->run($cypher, ['dbName' => 'neo4j']);
+
+                        // MongoDB
                         if(!isset($in[$dataIn[0]])){
                             $in[$dataIn[0]] = [];
                         }
