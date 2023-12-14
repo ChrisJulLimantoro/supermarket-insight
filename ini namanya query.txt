@@ -6,6 +6,16 @@ RETURN p2.product_id, COUNT(p2) as countProduct, COLLECT(s.sales_id), COLLECT(st
 ORDER BY countProduct DESC
 
 // Apple dibagi smua bdk bulan + toko
+MATCH (p:Product)-[r]->(s:Sales)-[]-(st:Store)
+WHERE p.product_id = 'PRD_191'
+AND s.date.month IN [3,4,5]
+AND st.store_id IN ['STR_012']
+WITH COUNT(p) as p
+MATCH (t:Sales)-[]-(st:Store)
+WHERE st.store_id IN ['STR_012']
+AND t.date.month IN [3,4,5]
+WITH p, COUNT(t) as t
+RETURN toFloat(p)/toFloat(t)*100
 
 // Rekomendasi Supplier bdk Warehouse
 MATCH (w:Warehouse)-[]-(d:Delivery)-[]-(s:Supplier)
@@ -16,3 +26,11 @@ RETURN s, leadTime, p.price - unit_price as margin
 ORDER BY leadTime
 
 // query count of delivery di warehouse apa
+MATCH (w:Warehouse)-[]-(d:Delivery)-[]-(s:Supplier)
+MATCH (d)-[r]-(p:Product)
+WHERE w.warehouse_id = 'WRH_001' AND p.product_id = 'PRD_001'
+RETURN COUNT(d)
+
+MATCH (p:Product)
+WHERE p.product_id = 'PRD_001'
+RETURN p.price
