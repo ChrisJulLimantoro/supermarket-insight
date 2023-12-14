@@ -15,7 +15,7 @@ MATCH (t:Sales)-[]-(st:Store)
 WHERE st.store_id IN ['STR_012']
 AND t.date.month IN [3,4,5]
 WITH p, COUNT(t) as t
-RETURN toFloat(p)/toFloat(t)*100
+RETURN toFloat(p)/toFloat(t)*100 as percentage
 
 // Rekomendasi Supplier bdk Warehouse
 MATCH (w:Warehouse)-[]-(d:Delivery)-[]-(s:Supplier)
