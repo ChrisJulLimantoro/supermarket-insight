@@ -1,0 +1,18 @@
+// Rekomendasi Produk bdk produk, bulan, dan toko
+MATCH (p1:Product)-[]->(s:Sales)<-[]-(p2:Product)
+MATCH (st:Store)-[]-(s)
+WHERE p1.product_id = 'PRD_191' AND p1 <> p2 AND s.date.month IN [3,4,5] AND st.store_id = 'STR_012'
+RETURN p2.product_id, COUNT(p2) as countProduct, COLLECT(s.sales_id), COLLECT(st.store_id)
+ORDER BY countProduct DESC
+
+// Apple dibagi smua bdk bulan + toko
+
+// Rekomendasi Supplier bdk Warehouse
+MATCH (w:Warehouse)-[]-(d:Delivery)-[]-(s:Supplier)
+MATCH (d)-[r]-(p:Product)
+WHERE w.warehouse_id = 'WRH_008' AND p.product_id = 'PRD_140'
+WITH s.supplier_id as s, AVG(duration.inDays(d.order_date,d.arrival_date).days) as leadTime, SUM(r.unit_price * r.quantity)/SUM(r.quantity) as unit_price, p
+RETURN s, leadTime, p.price - unit_price as margin
+ORDER BY leadTime
+
+// query count of delivery di warehouse apa
