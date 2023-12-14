@@ -408,9 +408,20 @@
                         $dateTime = DateTime::createFromFormat('m/d/Y', $arrivalDate);
                         $formattedArrivalrDate = $dateTime->format('Y-m-d');
 
+                        try {
+                            $sql = "SELECT price FROM product WHERE product_id = '$dataIn[5]'";
+                            $stmt = $conn_sql->prepare($sql);
+                            $stmt->execute();
+                        } catch (PDOException $e) {
+                            echo json_encode(['error' => 'Belum input Product!', 'code' => 400]);
+                            exit;
+                        }
+                        $resProd = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $price = floatval($resProd['price']);
+
                         // Neo4j
                         $cypher = <<< CYPHER
-                            MERGE (p:Product {product_id: '$dataIn[5]'})
+                            MERGE (p:Product {product_id: '$dataIn[5]', price: $price})
                             MERGE (s:Supplier {supplier_id: '$dataIn[3]'})
                             MERGE (w:Warehouse {warehouse_id: '$dataIn[4]'})
                             MERGE (d:Delivery {delivery_id: '$dataIn[0]', order_date:date('$formattedOrderDate'), arrival_date:date('$formattedArrivalrDate')})
