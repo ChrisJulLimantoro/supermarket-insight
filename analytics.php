@@ -1213,7 +1213,7 @@
                     AND s.date.month IN \$months
                     WITH COUNT(p) as p
                     MATCH (t:Sales)-[]-(st:Store)
-                    AND t.date.month IN \$months
+                    WHERE t.date.month IN \$months
                     WITH p, COUNT(t) as t
                     RETURN toFloat(p)/toFloat(t)*100 as percentage
                 CYPHER;

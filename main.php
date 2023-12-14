@@ -711,7 +711,7 @@
                 data : dataAjax,
                 success : function(res){
                     res = JSON.parse(res)
-                    console.log(res)
+                    // console.log(res)
                     let min = 3000000;
                     let max = 0;
                     Object.entries(res.y).forEach(([key, value]) => {
@@ -956,6 +956,7 @@
                 method : "POST",
                 data : dataAjax,
                 success:function(res){
+                    // console.log(res);
                     res = JSON.parse(res)
                     // Data
                     const dataChartFunnelExample = {
@@ -1074,7 +1075,7 @@
                 method : "POST",
                 data : dataAjax,
                 success: function(res){
-                    console.log(res);
+                    // console.log(res);
                     res = JSON.parse(res)
                     const dataChartDobuleYAxisExample = {
                         type: 'bar',
