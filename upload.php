@@ -404,7 +404,7 @@
                         $dateTime = DateTime::createFromFormat('m/d/Y', $orderDate);
                         $formattedOrderDate = $dateTime->format('Y-m-d');
 
-                        $arrivalDate = $dataIn[1];
+                        $arrivalDate = $dataIn[2];
                         $dateTime = DateTime::createFromFormat('m/d/Y', $arrivalDate);
                         $formattedArrivalrDate = $dateTime->format('Y-m-d');
 
@@ -414,7 +414,7 @@
                             MERGE (s:Supplier {supplier_id: '$dataIn[3]'})
                             MERGE (w:Warehouse {warehouse_id: '$dataIn[4]'})
                             MERGE (d:Delivery {delivery_id: '$dataIn[0]', order_date:date('$formattedOrderDate'), arrival_date:date('$formattedArrivalrDate')})
-                            MERGE (w)<-[:DELIVERED_TO]-(p)
+                            MERGE (w)<-[:DELIVERED_TO]-(d)
                             MERGE (p)-[r:DELIVERED_AT]->(d)
                             ON CREATE SET r.quantity = $dataIn[7], r.unit_price = $dataIn[6]
                             MERGE (s)<-[:PROCESSED_AT]-(d)
