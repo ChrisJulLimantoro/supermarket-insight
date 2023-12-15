@@ -1276,7 +1276,9 @@
                 $stmt = $conn_sql->prepare($sql);
                 $stmt->execute([':id' => $r->get('p2.product_id')]);
                 $name = $stmt->fetchColumn();
-                $x[] = substr($name,0,10);
+                // $x[] = substr($name,0,15);
+                $x[] = $name;
+                // $x[] =  $r->get('p2.product_id');
                 $y[] = $r->get('countProduct');
             }
             foreach($result2 as $r){
